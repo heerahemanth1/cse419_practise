@@ -14,101 +14,110 @@ struct module{
 
 typedef struct head head;
 typedef struct module mode;
-struct head *hh = NULL;
+
+head *hh = NULL;
+
+void display(){
+	head *t = hh;
+	while(t!=NULL){
+		mode *m = t->li;
+		if(m!=NULL){
+			printf("%s: ",m->data);
+			m = m->ne;
+		}
+		while(m!=NULL){
+			printf("%s ",m->data);
+			m = m->ne;
+		}
+		printf("\n");
+		t = t->ne;
+	}
+}
 
 void insert(){
-	mode *n = malloc(sizeof(struct module));
-	printf("Enter the new Module name to be inserted: ");
-	scanf("%s",n->data);
-	head *nh = malloc(sizeof(struct head));
-	nh->li = n;
-	nh->ne = NULL;
-	head *t = hh;
-	if(t==NULL){
-		hh = nh;
-	}else{
-		while(t->ne!=NULL){
-			t = t->ne;
-		}
-		t->ne = nh;
-	}
+	head *nh = (struct head *)malloc(sizeof(struct head));
+	mode *nm = (struct module *)malloc(sizeof(struct module));
+	printf("Enter the name of the new module to be created\n");
+	scanf("%s",nm->data);
+	nm->ne = NULL;
+	nh->li = nm;
+	nh->ne = hh;
+	hh = nh;
+	display();
 }
 
 void modify(){
-	char tname[20];
-	int flag = 0;
+	char mod[20];
 	printf("Enter the name of the module to be modified: ");
-	scanf("%s",tname);
-	mode *n = malloc(sizeof(struct module));
-	printf("Enter the name of the object to be inserted in the module: ");
-	scanf("%s",n->data);
-	n->ne = NULL;
-	head *h = hh;
-	if(h==NULL){
-		printf("Oops! there are no modules\n");
-	}else{
-		while(h!=NULL){
-			if(strcmp((h->li)->data,tname)==0){
-				flag = 1;
-				mode *t = (h->li)->ne;
-				while(t->ne!=NULL){
-					t = t->ne;
-				}
-				t->ne = n;
+	scanf("%s",mod);
+	mode *nm = (struct module *)malloc(sizeof(struct module));
+	printf("Enter the new object to be insered in %s: ",mod);
+	scanf("%s",nm->data);
+	head *th = hh;
+	if(th!=NULL){
+		while(th!=NULL){
+			mode *tm = th->li;
+			if(strcmp(tm->data,mod)==0){
+				nm->ne = tm->ne;
+				tm->ne = nm;
 			}
-			h = h->ne;
-		}
-		if(flag==1){
-			printf("New object successfully inserted into prescribed module\n");
-		}else{
-			printf("Sorry! Couldn't find requested module\n");
+			th = th->ne;
 		}
 	}
+	display();
 }
 
 void lookUp(){
-	char sen[100],temp[20];
+	char sen[100],temp[20],mod[20];
 	printf("Enter a sentence: ");
 	scanf("%s",sen);
 	int i=0;
+	int top=0;
 	int n = strlen(sen);
 	while(i<n){
-		if(sen[i]!=' ' || sen[i]!='\0'){
-			strncat(temp, sen[i], 1);
+		if(sen[i]!=' ' && i!=n-1){
+			temp[top] = sen[i];
+			top++;
+			temp[top] = '\0';
 		}else{
-			if(strlen(temp)!=0){
-				mode *t = 
+			if(i==n-1){
+				temp[top] = sen[i];
+				top++;
+				temp[top] = '\0';
 			}
-			memset(temp, '\0', sizeof(temp));
+			head *th = hh;
+			while(th!=NULL){
+				mode *m = th->li;
+				strcpy(mod,m->data);
+				m = m->ne;
+				while(m!=NULL){
+					if(strcmp(m->data,temp)==0){
+						printf("\n%s: %s\n",mod,temp);
+					}
+					m = m->ne;
+				}
+				th = th->ne;
+			}
+			memset(temp,'\0',sizeof(temp));
+			top=0;
 		}
 		i++;
 	}
 }
 
-void printMenu(){
-	printf("\nMenu\n1)Insert\n2)Modify\n3)Look Up\n");
-}
-
 int main(){
-	int n=0;
-	char c;
+	int ch,op;
 	do{
-		printMenu();
-		scanf("%d",&n);
-		switch(n){
-			case 1:
-				insert();
-				break;
-			case 2:
-				modify();
-				break;
-			case 3:
-				lookUp();
-				break;
-			default:
-				printf("Please choose a valid option. Thank you.\n")
+		printf("\nMenu\n1)Insert\t2)Modify\t3)Look Up\n");
+		scanf("%d",&ch);
+		if(ch==1){
+			insert();
+		}else if(ch==2){
+			modify();
+		}else if(ch==3){
+			lookUp();
 		}
-		printf("Do you wish to continue?(y/n)\n");
-		scanf("%c",&c);
-	}while(c=='y' || c=='Y');
+		printf("Do you wish to continue?(y=1/n=0):\t");
+		scanf("%d",&op);
+	}while(op==1);
 }
